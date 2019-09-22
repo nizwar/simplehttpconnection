@@ -3,7 +3,7 @@
 Simple HTTP Connection, a library that i made to help me request data from internet while i develop flutter app, so i think i wanted to share it here ☺
 This library using [Http](https://pub.dev/packages/http)
 
-## Let's Introcode!
+## Let's Code!
 ```dart
 var url = "https://postman-echo.com/get"
 ResponseHttp respHttp = await  HttpConnection.doConnection(url);
