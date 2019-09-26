@@ -5,15 +5,18 @@ main() {
   String tryUrl = "https://postman-echo.com/get";
   HttpConnection httpConnection = HttpConnection();
   group('Test Stuff', () {
-    test('httpConnection Operation', () async{
-      ResponseHttp respHttp = await httpConnection.connect(tryUrl, method: Method.post); 
+    test('httpConnection Operation', () async {
+      ResponseHttp respHttp =
+          await httpConnection.connect(tryUrl, method: Method.post);
       print("Status Code 1 : ${respHttp.statusCode}");
       print("Status Headers 1 : ${respHttp.headers.toString()}");
       print("Content 1 : ${respHttp.content.toString()}");
-      httpConnection.close(); 
-      
-      httpConnection.initConnection();   ///After close, you have to init the connection
-      respHttp = await httpConnection.connect(tryUrl, method: Method.post); 
+      httpConnection.close();
+
+      httpConnection.initConnection();
+
+      ///After close, you have to init the connection
+      respHttp = await httpConnection.connect(tryUrl, method: Method.post);
       print("Status Code 2 : ${respHttp.statusCode}");
       print("Status Headers 2 : ${respHttp.headers.toString()}");
       print("Content 2 : ${respHttp.content.toString()}");
@@ -45,6 +48,13 @@ main() {
       print("Status Code : ${respHttp.statusCode}");
       print("Status Headers : ${respHttp.headers.toString()}");
       print("Content : ${respHttp.content.asJson()}");
+    });
+
+    test("Download Data", () async {
+      await HttpConnection.download(
+          "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+          path: "D:",
+          downloadProgress: (progress, count, max) {});
     });
   });
 }

@@ -1,8 +1,22 @@
+///
+/// Coded by Happy man who love chocolates
+/// Moch Nizwar Syafuan, nizwar@merahputih.id
+///
+/// Fun plugin to doing some httpconnection stuff with simpliest way
+/// psst... you can also download file now!
+///
+
 library simplehttpconnection;
 
+import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:http/http.dart';
+import 'package:path/path.dart';
+import 'package:path_provider/path_provider.dart';
+
+typedef void DownloadProgress(int progress, int byteCount, int totalBytes);
 
 ///Simple HTTP Connection start here
 class HttpConnection {
@@ -15,6 +29,14 @@ class HttpConnection {
   }
 
   ///do Connection, call as object, do not forget to close it
+  //////
+  /// `url` : Where you want to request data
+  /// `method` : As String, you can use class Method to use supported method
+  /// `headers` : Set request headers
+  /// `body` : You can also use this to get Method (Method.get)
+  /// url will automaticly parsed to String
+  /// `encoding` : Encoding request
+  ///
   Future<ResponseHttp> connect(String url,
       {String method,
       Map<String, String> body,
@@ -54,8 +76,7 @@ class HttpConnection {
             headers: headers ?? {});
         break;
       default:
-        throw Exception(
-            "Invalid request, use class Method to make it clear");
+        throw Exception("Invalid request, use class Method to make it clear");
         break;
     }
 
@@ -77,7 +98,92 @@ class HttpConnection {
     closed = false;
   }
 
-  ///The magic start here!, you can request directly using this function
+  ///
+  ///You can simply download data from this function
+  /// `path` : Path to save the file
+  /// (default for android ExternalStorageDirectory or /0/download)
+  /// `filename` : Change filaname (default as the url)
+  /// `downloadProgress` : Callback(int progress, int byteCount, int totalBytes)
+  /// Progress between 0 - 100
+  ///
+  static Future<String> download(String url,
+      {String path, String filename, DownloadProgress downloadProgress}) async {
+    //Initialize all thing
+
+    //Check the path
+    String currPath = path;
+    if (Platform.isAndroid) {
+      currPath = path ??
+              await getExternalStorageDirectory() ??
+              Directory("/storage/emulated/0/Download").exists()
+          ? Directory("/storage/emulated/0/Download").toString()
+          : null;
+
+      if (currPath == null) assert(path != null);
+    } else {
+      assert(path != null);
+    }
+
+    //Prepare the connection
+    HttpClient httpClient = HttpClient();
+    httpClient.connectionTimeout = Duration(seconds: 10);
+    httpClient.badCertificateCallback = ((cert, host, port) => true);
+
+    Uri uri = Uri.tryParse(url);
+    if (uri == null) throw Exception("URL not valid");
+
+    final tempRes = await httpClient.getUrl(Uri.parse(url));
+    tempRes.headers
+        .add(HttpHeaders.contentTypeHeader, "application/octet-stream");
+    final response = await tempRes.close();
+
+    //Lets begin
+    int byteCount = 0; //Define byteCount
+    int totalBytes = response.contentLength; //Define totalBytes
+
+    File fileStuff = File(currPath +
+        "/" +
+        (filename ?? response.headers["filename"] ?? basename(url)));
+
+    RandomAccessFile raf = fileStuff.openSync(mode: FileMode.write);
+    Completer output = Completer<String>();
+    response.listen((data) {
+      //OnProgress
+      byteCount += data.length;
+      raf.writeFromSync(data);
+      if (downloadProgress != null)
+        downloadProgress(
+            (100 / totalBytes * byteCount).floor(), byteCount, totalBytes);
+    }, onDone: () {
+      //Everything is done
+      raf.closeSync();
+      if (downloadProgress != null)
+        downloadProgress(100, byteCount, totalBytes);
+      output.complete(fileStuff.path);
+    }, onError: (e) {
+      //Hmm.. something wrong here
+      raf.closeSync();
+      fileStuff.deleteSync();
+      output.completeError(e);
+    }, cancelOnError: true);
+    return output.future;
+  }
+
+  ///Get filename from url
+  static String filenameFromUrl(String url) {
+    return basename(url);
+  }
+
+  ///
+  ///The magic start here!, you can request directly using this function to request data from Internet
+  ///
+  /// `url` : Where you want to request data
+  /// `method` : As String, you can use class Method to use supported method
+  /// `headers` : Set request headers
+  /// `body` : You can also use this to get Method (Method.get)
+  /// url will automaticly parsed to String
+  /// `encoding` : Encoding request
+  ///
   static Future<ResponseHttp> doConnection(String url,
       {String method,
       Map<String, String> body,
@@ -114,8 +220,7 @@ class HttpConnection {
             headers: headers ?? {});
         break;
       default:
-        throw Exception(
-            "Invalid request, use class Method to make it clear"); 
+        throw Exception("Invalid request, use class Method to make it clear");
         break;
     }
 
@@ -126,7 +231,7 @@ class HttpConnection {
     return responseHttp;
   }
 
-  ///This the secret, GET using MAP as params
+  ///This the secret, GET using MAP as params xoxo
   static String _paramToString(Map<String, String> params) {
     String output = "?";
     if (params != null) {
