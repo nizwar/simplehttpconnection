@@ -1,8 +1,8 @@
-## [1.2.1] - 23 Sept 2019
+## [1.2.1] - 26 Sept 2019
 
 * Add get filesize by url function.
 
-## [1.2.0] - 23 Sept 2019
+## [1.2.0] - 26 Sept 2019
 
 * Add download function.
 * Add get filename by url function.
