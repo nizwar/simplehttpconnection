@@ -124,14 +124,10 @@ class HttpConnection {
       assert(path != null);
     }
 
-    //Prepare the connection
-    HttpClient httpClient = HttpClient();
-    httpClient.connectionTimeout = Duration(seconds: 10);
-    httpClient.badCertificateCallback = ((cert, host, port) => true);
-
     Uri uri = Uri.tryParse(url);
     if (uri == null) throw Exception("URL not valid");
-
+    //Prepare the connection
+    HttpClient httpClient = _getHttpClient();
     final tempRes = await httpClient.getUrl(Uri.parse(url));
     tempRes.headers
         .add(HttpHeaders.contentTypeHeader, "application/octet-stream");
@@ -172,6 +168,14 @@ class HttpConnection {
   ///Get filename from url
   static String filenameFromUrl(String url) {
     return basename(url);
+  }
+
+  ///Get filesize from url
+  static Future<int> filesizeFromUrl(String url) async {
+    Uri uri = Uri.tryParse(url);
+    if (uri == null) throw Exception("URL not valid");
+    var r = await _getHttpClient().getUrl(uri).then((resp) => resp.close());
+    return r.contentLength;
   }
 
   ///
@@ -242,6 +246,12 @@ class HttpConnection {
       output = "";
     }
     return output;
+  }
+
+  static HttpClient _getHttpClient() {
+    return HttpClient()
+      ..connectionTimeout = Duration(seconds: 10)
+      ..badCertificateCallback = ((cert, host, port) => true);
   }
 }
 

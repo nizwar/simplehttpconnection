@@ -53,8 +53,13 @@ main() {
     test("Download Data", () async {
       await HttpConnection.download(
           "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-          path: "D:",
-          downloadProgress: (progress, count, max) {});
+          path: "D:", downloadProgress: (progress, count, max) {
+        print(max.toString());
+      });
+      print(await HttpConnection.filesizeFromUrl(
+          "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"));
     });
   });
 }
+// Selamat malam semua, terimakasih sudah mengizinkan saya bergabung...
+// Perkenalkan (sesuai dengan profil FB) nama saya Mochamad Nizwar Syafuan,
