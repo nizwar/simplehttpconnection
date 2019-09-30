@@ -1,3 +1,8 @@
+## [1.3.0] - 30 Sept 2019
+
+* Download file from SimpleDownload
+* Add head method
+
 ## [1.2.1] - 26 Sept 2019
 
 * Add get filesize by url function.

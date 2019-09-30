@@ -1,3 +1,4 @@
+@Timeout(Duration(days: 1))
 import 'package:flutter_test/flutter_test.dart';
 import 'package:simplehttpconnection/simplehttpconnection.dart';
 
@@ -51,15 +52,12 @@ main() {
     });
 
     test("Download Data", () async {
-      await HttpConnection.download(
+      SimpleDownload simpleDownload = SimpleDownload();
+      print(await simpleDownload.start(
           "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
           path: "D:", downloadProgress: (progress, count, max) {
-        print(max.toString());
-      });
-      print(await HttpConnection.filesizeFromUrl(
-          "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"));
+        print("Lagi Download : " + progress.toString() + "%");
+      }));
     });
   });
 }
-// Selamat malam semua, terimakasih sudah mengizinkan saya bergabung...
-// Perkenalkan (sesuai dengan profil FB) nama saya Mochamad Nizwar Syafuan,

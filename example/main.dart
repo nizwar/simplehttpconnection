@@ -1,3 +1,4 @@
+@Timeout(Duration(days: 1))
 import 'package:flutter_test/flutter_test.dart';
 import 'package:simplehttpconnection/simplehttpconnection.dart';
 
@@ -51,10 +52,16 @@ main() {
     });
 
     test("Download Data", () async {
-      await HttpConnection.download(
+      SimpleDownload simpleDownload = SimpleDownload();
+      print(await simpleDownload.start(
           "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-          path: "D:",
-          downloadProgress: (progress, count, max) {});
+          path: "D:", downloadProgress: (progress, count, max) {
+        print("Downloading : " + progress.toString() + "%");
+      }));
+
+      simpleDownload.pause(); //Pause your download
+      simpleDownload.resume(); //Resume your download
+      simpleDownload.stop(); //Stop your download
     });
   });
 }

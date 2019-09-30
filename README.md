@@ -95,17 +95,20 @@ HttpConnection.doConnection(url, encoding: utf8);
 
 ## Download
 
-Now you can download file from SimpleHttpConnection in simpliest way :D
+Now you can download file from SimpleDownload in simpliest way :D
 Thanks to Eka Setiawan Saputra from Flutter Indonesia for inspiring me...
+Updated, now you can controll your download progress.... 
 ```dart
 ... 
-await HttpConnection.download(
-    "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",    //Download URL
-    path: "YOUR PATH HERE",
-    filename: "YOUR FILENAME HERE", //Do not declare if you want origin name 
-    downloadProgress: (progress, byteCount, totalBytes) {
-        "<Do your magic here>"
-    },);
+SimpleDownload simpleDownload = SimpleDownload();
+print(await simpleDownload.start(
+    "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+    path: "D:", downloadProgress: (progress, count, max) {
+    print("Downloading : " + progress.toString() + "%");
+})); 
+simpleDownload.pause();  //Pause your download
+simpleDownload.resume(); //Resume your download 
+simpleDownload.stop();   //Stop your download
 ...
 ```
 
